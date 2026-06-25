@@ -4,27 +4,24 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class SBCommands implements SBCommandsInterface{
-    public Command moveForwardCommand(double metersToMove){
-        //TODO: return a command that will move your robot forward a distance of metersToMove
-        //Example: return new GoToPoint(metersToMove, 0, new Rotation2d(0), true);
+    public Command moveForwardCommand(double timeToMoveFor){
+        //TODO: return a command that will move your robot forward for timeToMoveFor seconds
+        //Example: return new GoToPoint(timeToMoveFor, 0, new Rotation2d(0), true);
      }
-    public Command moveLeftCommand(double metersToMove){
-        //TODO: return a command that will move your robot left a distance of metersToMove
+    public Command moveBackCommand(double timeToMoveFor){
+        //TODO: return a command that will move your robot backward for timeToMoveFor seconds
     }
-    public Command moveRightCommand(double metersToMove){
-        //TODO: return a command that will move your robot right a distance of metersToMove
+    public Command turnClockwiseCommand(double timeToTurnFor){
+        //TODO: return a command that will turn your robot CW for timeToTurnFor seconds.
     }
-    public Command moveBackCommand(double metersToMove){
-        //TODO: return a command that will move your robot back a distance of metersToMove
+    public Command turnCounterClockwiseCommand(double timeToTurnFor){
+        //TODO: return a command that will turn your robot CCW for timeToTurnFor seconds.
     }
-    public Command turnClockwiseCommand(double radiansToTurn){
-        //TODO: return a command that will turn your robot CW a distance of radiansToTurn
-    }
-    public Command turnCounterClockwiseCommand(double radiansToTurn){
-        //TODO: return a command that will turn your robot CCW a distance of radiansToTurn
-    }
-    public Command joyStickControlCommand(Supplier<Double> xVelocity, Supplier<Double> yVelocity){
+    public Command joyStickControlCommand(Supplier<Double> xInput, Supplier<Double> yInput){
         //TODO: return a command that will allow 2D joystick control
-        //Example: return new JoystickControl(xVelocity,yVelocity, () -> {return 0.0;});
+        //The robot should steer left when yInput is positive and steer right when yInput is negative. Forward when xInput is positive.
+        /*Example:
+         return new ArcadeControl(xInput,yInput);
+        */
     }
 }

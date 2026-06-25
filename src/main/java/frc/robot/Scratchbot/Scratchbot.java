@@ -18,20 +18,6 @@ public class Scratchbot{
         toRun.addCommands(sbCommands.moveForwardCommand(metersToMove));
     }
     /**
-     * Moves the robot left by a specified distance in meters.
-     * @param metersToMove The distance in meters to move the robot left.
-     */
-    public static void sb_moveLeft(double metersToMove){
-        toRun.addCommands(sbCommands.moveLeftCommand(metersToMove));
-    }
-    /**
-     * Moves the robot right by a specified distance in meters.
-     * @param metersToMove The distance in meters to move the robot right.s
-     */
-    public static void sb_moveRight(double metersToMove){
-        toRun.addCommands(sbCommands.moveRightCommand(metersToMove));
-    }
-    /**
      * Moves the robot backward by a specified distance in meters.
      * @param metersToMove The distance in meters to move the robot backward.
      */
