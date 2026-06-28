@@ -1,7 +1,7 @@
 <h1>Scratchbot Lessons</h1>
 <h3>What is Scratchbot?</h3>
 Scratchbot is a teaching program that helps people learn FRC programming with no prior programming experience. The core idea behind Scratchbot is to allow rookies to move the robot from day 1 rather then having them learn the language separately.<br><br>
-This repository has various pre-made methods such as "moveForward()" or "turnRight()" that can be called without any prior knowledge.
+This repository has various pre-made methods such as "moveForward()" or "turnClockwise()" that can be called without any prior knowledge.
 These methods are then utilized alongside a custom lesson structure that incorporates W3Schools along with over 50 lessons & exercises made by Wingspan. This helps to teach rookies the fundamentals of coding while keeping them engaged via robot interaction.
 They use these methods with for loops, conditionals, and overtime progress to making their own classes under a command-based paradigm without any Scratchbot methods.
 
