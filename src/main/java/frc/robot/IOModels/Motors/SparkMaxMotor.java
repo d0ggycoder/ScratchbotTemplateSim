@@ -82,7 +82,6 @@ public class SparkMaxMotor implements MotorIO{
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .minOutput(-1, ControlMode.kVelocity.slot)
             .maxOutput(1, ControlMode.kVelocity.slot)
-            .positionWrappingEnabled(config.poseWrapping)
             .pid(
                 config.kPIDVel[0],
                 config.kPIDVel[1],
@@ -98,30 +97,39 @@ public class SparkMaxMotor implements MotorIO{
         this.controller = motor.getClosedLoopController();
     }
 
+    @Override
     public void setVelocityPID(double vel){
         controller.setSetpoint(vel, ControlType.kVelocity, ControlMode.kVelocity.slot);
         mode = ControlMode.kVelocity;
     }
 
+    @Override
     public void setPositionPID(double pos){
         controller.setSetpoint(pos, ControlType.kPosition, ControlMode.kPosition.slot);
         mode = ControlMode.kPosition;
     }
 
+    @Override
     public void setEncoderPos(double pos){
         encoder.setPosition(pos);
     }
 
+    @Override
     public void setVoltage(Voltage volts){
         motor.setVoltage(volts);
     }
 
+    @Override
     public double getVelocity(){
         return encoder.getVelocity();
     }
+
+    @Override
     public double getPosition(){
         return encoder.getPosition();
     }
+
+    @Override
     public double getVoltage(){
         return motor.getAppliedOutput()*motor.getBusVoltage();
     }

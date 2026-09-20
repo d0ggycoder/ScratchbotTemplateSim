@@ -22,14 +22,17 @@ public interface MotorIO {
             kBrushless;
         }
         //Order: kP, kI, kD, kV, kS
-        protected double[] kPIDPos = new double[5]; 
-        protected double[] kPIDVel = new double[5];
-        protected boolean poseWrapping = true;
-        protected IdleMode idleMode = IdleMode.kCoast;
-        protected double positionConversionFactor = 1;
-        protected double velocityConversionFactor = 1;
-        protected MotorType motorType;
-        protected int currentLimit = 60;
+        public double[] kPIDPos = new double[5]; 
+        public double[] kPIDVel = new double[5];
+        public boolean poseWrapping = true;
+        public double wrapLow = 0;
+        public double wrapHigh = 2*Math.PI;
+        public boolean reversed = false;
+        public IdleMode idleMode = IdleMode.kCoast;
+        public double positionConversionFactor = 1;
+        public double velocityConversionFactor = 1;
+        public MotorType motorType;
+        public int currentLimit = 60;
         
         public MotorConfig(){}
 
@@ -39,7 +42,7 @@ public interface MotorIO {
          * @param pidArr Array of PID coefficients in the order of [kP,kI,kD,kV,kS]
          * @return This object for method chaining
          */
-        MotorConfig withPositionPID(double[] pidArr){
+        public MotorConfig withPositionPID(double[] pidArr){
             kPIDPos[0] = pidArr[0];
             kPIDPos[1] = pidArr[1];
             kPIDPos[2] = pidArr[2];
@@ -55,7 +58,7 @@ public interface MotorIO {
          * @param kD Derivative control gain
          * @return This object for method chaining
          */
-        MotorConfig withPositionPID(double kP, double kI, double kD){
+        public MotorConfig withPositionPID(double kP, double kI, double kD){
             kPIDPos[0] = kP;
             kPIDPos[1] = kI;
             kPIDPos[2] = kD;
@@ -71,7 +74,7 @@ public interface MotorIO {
          * @param kV Cruise velocity voltage control gain
          * @return This object for method chaining
          */
-        MotorConfig withPositionPID(double kP, double kI, double kD, double kS, double kV){
+        public MotorConfig withPositionPID(double kP, double kI, double kD, double kS, double kV){
             kPIDPos[0] = kP;
             kPIDPos[1] = kI;
             kPIDPos[2] = kD;
@@ -86,7 +89,7 @@ public interface MotorIO {
          * @param pidArr Array of PID coefficients in the order of [kP,kI,kD,kV,kS]
          * @return This object for method chaining
          */
-        MotorConfig withVeloctiyPID(double[] pidArr){
+        public MotorConfig withVeloctiyPID(double[] pidArr){
             kPIDVel[0] = pidArr[0];
             kPIDVel[1] = pidArr[1];
             kPIDVel[2] = pidArr[2];
@@ -102,7 +105,7 @@ public interface MotorIO {
          * @param kD Derivative control gain
          * @return This object for method chaining
          */
-        MotorConfig withVelocityPID(double kP, double kI, double kD){
+        public MotorConfig withVelocityPID(double kP, double kI, double kD){
             kPIDVel[0] = kP;
             kPIDVel[1] = kI;
             kPIDVel[2] = kD;
@@ -118,7 +121,7 @@ public interface MotorIO {
          * @param kV Cruise velocity voltage control gain
          * @return This object for method chaining
          */
-        MotorConfig withVelocityPID(double kP, double kI, double kD, double kS, double kV){
+        public MotorConfig withVelocityPID(double kP, double kI, double kD, double kS, double kV){
             kPIDVel[0] = kP;
             kPIDVel[1] = kI;
             kPIDVel[2] = kD;
@@ -127,23 +130,28 @@ public interface MotorIO {
             return this;
         }
 
-        MotorConfig withPositionConversionFactor(double positionConversionFactor){
+        public MotorConfig withPositionConversionFactor(double positionConversionFactor){
             this.positionConversionFactor = positionConversionFactor;
             return this;
         }
 
-        MotorConfig withVelocityConversionFactor(double velocityConversionFactor){
+        public MotorConfig withVelocityConversionFactor(double velocityConversionFactor){
             this.velocityConversionFactor = velocityConversionFactor;
             return this;
         }
 
-        MotorConfig withIdleMode(IdleMode idleMode){
+        public MotorConfig withIdleMode(IdleMode idleMode){
             this.idleMode = idleMode;
             return this;
         }
 
-        MotorConfig withPoseWrapping(boolean poseWrapping){
+        public MotorConfig withPoseWrapping(boolean poseWrapping){
             this.poseWrapping = poseWrapping;
+            return this;
+        }
+
+        public MotorConfig withReversed(boolean reversed){
+            this.reversed = reversed;
             return this;
         }
     }
