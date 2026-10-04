@@ -1,6 +1,7 @@
 package frc.robot.IOModels.Gyros;
 
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
@@ -11,9 +12,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Robot;
 
 public class NavX2Gyro implements GyroIO{
+    private static NavX2Gyro instance;
     private final GyroIO gyro;
     
-    public NavX2Gyro(NavXComType portType){
+    private NavX2Gyro(NavXComType portType){
         if(Robot.isSimulation()){
             gyro = new SimulatedNavX2Gyro(portType);
         } else {
@@ -31,6 +33,13 @@ public class NavX2Gyro implements GyroIO{
 
     public static NavX2Gyro getSimulatedGyro(NavXComType portType){
         return new NavX2Gyro(new SimulatedNavX2Gyro(portType));
+    }
+
+    public static NavX2Gyro getDefaultGyro(NavXComType portType){
+        if(instance == null){
+            instance = new NavX2Gyro(portType);
+        }
+        return instance;
     }
 
     @Override
@@ -76,6 +85,20 @@ public class NavX2Gyro implements GyroIO{
         @Override
         public Rotation2d getRotation(){
             return gyro.getRotation2d();
+        }
+    }
+
+    public static class SimualtedNavX2GyroGetter implements Supplier<GyroSimulation>{
+        private final GyroIO gyro;
+        public SimualtedNavX2GyroGetter(GyroIO gyro){
+            this.gyro = gyro;
+        }
+        public GyroSimulation get(){
+            if(gyro instanceof SimulatedNavX2Gyro){
+                return ((SimulatedNavX2Gyro)gyro).gyro;
+            } else {
+                return null;
+            }
         }
     }
 

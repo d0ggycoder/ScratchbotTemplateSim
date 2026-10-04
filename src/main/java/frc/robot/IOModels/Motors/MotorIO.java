@@ -21,7 +21,7 @@ public interface MotorIO {
             kBrushed,
             kBrushless;
         }
-        //Order: kP, kI, kD, kV, kS
+        //Order: kP, kI, kD, kS, kV
         public double[] kPIDPos = new double[5]; 
         public double[] kPIDVel = new double[5];
         public boolean poseWrapping = true;
@@ -125,7 +125,7 @@ public interface MotorIO {
             kPIDVel[0] = kP;
             kPIDVel[1] = kI;
             kPIDVel[2] = kD;
-            kPIDVel[3]= kS;
+            kPIDVel[3] = kS;
             kPIDVel[4] = kV;
             return this;
         }

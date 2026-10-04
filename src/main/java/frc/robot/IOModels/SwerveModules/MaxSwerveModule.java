@@ -2,6 +2,8 @@ package frc.robot.IOModels.SwerveModules;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.function.Supplier;
+
 import frc.robot.Robot;
 import frc.robot.IOModels.Motors.SparkFlexMotor;
 import frc.robot.IOModels.Motors.SparkMaxMotor;
@@ -29,6 +31,23 @@ public class MaxSwerveModule implements SwerveModuleIO{
     private static final double driveRatio = 1/5.08;
     private static final double steeringMOI = 1.0/12 * 0.079 * (3*wheelRadius*wheelRadius + wheelWidth*wheelWidth); // 1/12 * M(3R^2+L^2)
     private static final double drivingEncoderPositionFactor = wheelCircumference * driveRatio;
+    private static final double drivingEncoderVelocityFactor = wheelCircumference * driveRatio / 60;
+
+    public static MotorConfig getDefaultDriveMotorConfig(){
+        return new MotorConfig()
+            .withPositionConversionFactor(drivingEncoderPositionFactor)
+            .withVelocityConversionFactor(drivingEncoderVelocityFactor)
+            .withIdleMode(null)
+            .withPoseWrapping(false);
+    }
+
+    public static MotorConfig getDefaultSteerMotorConfig(){
+        return new MotorConfig()
+            .withPositionConversionFactor(2*Math.PI)
+            .withVelocityConversionFactor(2*Math.PI/60)
+            .withIdleMode(null)
+            .withPoseWrapping(false);
+    }
 
     private final SwerveModuleIO module;
 
@@ -105,12 +124,29 @@ public class MaxSwerveModule implements SwerveModuleIO{
         }
     }
 
+    public static class SimulatedMaxSwerveModuleGetter implements Supplier<SwerveModuleSimulation>{
+        private final SwerveModuleIO module;
+        public SimulatedMaxSwerveModuleGetter(SwerveModuleIO module){
+            this.module = module;
+        }
+        @Override
+        public SwerveModuleSimulation get(){
+            if(module instanceof SimulatedMaxSwerveModule){
+                return ((SimulatedMaxSwerveModule)module).moduleSimulation;
+            } else {
+                return null;
+            }
+        }
+    }
+
     private static class SimulatedMaxSwerveModule implements SwerveModuleIO{
         private final SwerveModuleSimulation moduleSimulation;
         private final SimulatedMotorController.GenericMotorController driveMotor;
         private final SimulatedMotorController.GenericMotorController steerMotor;
         private final PIDController driveController;
         private final PIDController steerController;
+        private final MotorConfig driveConfig;
+        private final MotorConfig steerConfig;
 
         public SimulatedMaxSwerveModule(int drivingMotorID, MotorConfig driveConfig, int steerMotorID, MotorConfig steerConfig){
             moduleSimulation = new SwerveModuleSimulation(new SwerveModuleSimulationConfig(
@@ -129,6 +165,8 @@ public class MaxSwerveModule implements SwerveModuleIO{
             driveController = new PIDController(driveConfig.kPIDVel[0], driveConfig.kPIDVel[1], driveConfig.kPIDVel[2]);
             steerController = new PIDController(steerConfig.kPIDVel[0], steerConfig.kPIDVel[1], steerConfig.kPIDVel[2]);
             steerController.enableContinuousInput(-Math.PI, Math.PI);
+            this.driveConfig = driveConfig;
+            this.steerConfig = steerConfig;
         }
 
         @Override
@@ -143,8 +181,14 @@ public class MaxSwerveModule implements SwerveModuleIO{
         @Override
         public void update(){
             SwerveModuleState state = getSwerveModuleState();
-            driveMotor.requestVoltage(Volts.of(driveController.calculate(state.speedMetersPerSecond)*RobotController.getBatteryVoltage()));
-            steerMotor.requestVoltage(Volts.of(steerController.calculate(state.angle.getRadians())*RobotController.getBatteryVoltage()));
+            
+            double curDriveSpeed = moduleSimulation.getDriveWheelFinalSpeed().in(RadiansPerSecond);
+            double driveSignal = Math.signum(curDriveSpeed)*driveConfig.kPIDVel[3]+curDriveSpeed*driveConfig.kPIDVel[4]+driveController.calculate(state.speedMetersPerSecond);
+            driveMotor.requestVoltage(Volts.of(driveSignal*RobotController.getBatteryVoltage()));
+
+            double curSteerSpeed = moduleSimulation.getSteerAbsoluteEncoderSpeed().in(RadiansPerSecond);
+            double steerSignal = Math.signum(curSteerSpeed)*steerConfig.kPIDPos[3]+curDriveSpeed*steerConfig.kPIDVel[4]+steerController.calculate(state.angle.getRadians());
+            steerMotor.requestVoltage(Volts.of(steerSignal*RobotController.getBatteryVoltage()));
         }
 
         public SwerveModuleState getSwerveModuleState(){
