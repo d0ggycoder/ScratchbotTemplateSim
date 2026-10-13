@@ -1,15 +1,12 @@
 package frc.robot.PremadeDrivetrains.SwerveDrivetrain;
 
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import frc.robot.IOModels.Motors.MotorIO.MotorConfig;
 import frc.robot.IOModels.SwerveModules.MaxSwerveModule;
@@ -64,4 +61,6 @@ public class DrivetrainConstants {
 
     public static final double defaultDriveSpeed = 8;
     public static final double defaultTurnSpeed = 2*Math.PI;
+
+    public static final double maxAcceleration = 5;
 }

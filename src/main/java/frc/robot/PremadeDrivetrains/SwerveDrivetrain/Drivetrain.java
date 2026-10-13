@@ -69,6 +69,13 @@ public class Drivetrain extends SubsystemBase{
         SimulatedArena.getInstance().addDriveTrainSimulation(sim);
     }
 
+    @Override
+    public void periodic() {
+        for(SwerveModuleIO module:swerveModules){
+            module.update();
+        }
+    }
+
     public void setSwerveStates(double vx, double vy, double vomega, boolean fieldRelative){
         // What to multiply the speeds by in order to keep them in the drive speed range
         double descale = Math.min(1.0,DrivetrainConstants.maxDriveSpeed/Math.sqrt(vx*vx+vy*vy));
@@ -101,5 +108,9 @@ public class Drivetrain extends SubsystemBase{
             ret[i]=swerveModules[i].getSwerveModuleState();
         }
         return ret;
+    }
+
+    public ChassisSpeeds getChassisSpeeds(){
+        return kinematics.toChassisSpeeds(getSwerveModuleStates());
     }
 }
