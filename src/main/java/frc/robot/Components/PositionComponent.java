@@ -8,11 +8,9 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Robot;
 import frc.robot.Components.LimelightHelpers.PoseEstimate;
 import frc.robot.IOModels.Gyros.GyroIO;
 import frc.robot.IOModels.Gyros.NavX2Gyro;
@@ -37,8 +35,18 @@ public class PositionComponent{
 
     private PositionComponent(SwerveDriveKinematics kinematics, Supplier<SwerveModulePosition[]> swerveModulePositionsSupplier, 
                               Supplier<SwerveModuleState[]> swerveModuleStatesSupplier, Pose2d initialPose){
-        
-        
+        this.gyro = NavX2Gyro.getDefaultGyro(NavXComType.kMXP_SPI);
+        this.lastCache = initialPose;
+        this.kinematics = kinematics;
+        this.swerveModulePositionSupplier = swerveModulePositionsSupplier;
+        this.swerveModuleStatesSupplier = swerveModuleStatesSupplier;
+        this.poseEstimator = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation(), swerveModulePositionsSupplier.get(), initialPose);
+    }
+
+    private PositionComponent(){}
+
+    private void updateFields(SwerveDriveKinematics kinematics, Supplier<SwerveModulePosition[]> swerveModulePositionsSupplier, 
+                              Supplier<SwerveModuleState[]> swerveModuleStatesSupplier, Pose2d initialPose){
         this.gyro = NavX2Gyro.getDefaultGyro(NavXComType.kMXP_SPI);
         this.lastCache = initialPose;
         this.kinematics = kinematics;
@@ -53,7 +61,7 @@ public class PositionComponent{
      */
     public static PositionComponent getInstance(){
         if(instance == null){
-            throw new Error("Cannot get instance of PositionComponent before initialization :(");
+            instance = new PositionComponent();
         }
         return instance;
     }
@@ -67,7 +75,11 @@ public class PositionComponent{
      */
     public static PositionComponent initialize(SwerveDriveKinematics kinematics, Supplier<SwerveModulePosition[]> swerveModulePositionsSupplier, 
                                                Supplier<SwerveModuleState[]> swerveModuleStatesSupplier, Pose2d initialPose){
-        instance = new PositionComponent(kinematics, swerveModulePositionsSupplier, swerveModuleStatesSupplier, initialPose);
+        if(instance == null){
+            instance = new PositionComponent(kinematics, swerveModulePositionsSupplier, swerveModuleStatesSupplier, initialPose);
+        } else {
+            instance.updateFields(kinematics, swerveModulePositionsSupplier, swerveModuleStatesSupplier, initialPose);
+        }
         return instance;
     }
     /**

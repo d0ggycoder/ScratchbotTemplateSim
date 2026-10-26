@@ -185,15 +185,19 @@ public class MaxSwerveModule implements SwerveModuleIO{
             double curDriveSpeed = moduleSimulation.getDriveWheelFinalSpeed().in(RadiansPerSecond);
             double driveSignal = Math.signum(curDriveSpeed)*driveConfig.kPIDVel[3]+curDriveSpeed*driveConfig.kPIDVel[4]+driveController.calculate(state.speedMetersPerSecond);
             driveMotor.requestVoltage(Volts.of(driveSignal*RobotController.getBatteryVoltage()));
+            driveMotor.updateControlSignal(null, null, moduleSimulation.getDriveWheelFinalPosition(),moduleSimulation.getDriveWheelFinalSpeed());
 
             double curSteerSpeed = moduleSimulation.getSteerAbsoluteEncoderSpeed().in(RadiansPerSecond);
             double steerSignal = Math.signum(curSteerSpeed)*steerConfig.kPIDPos[3]+curDriveSpeed*steerConfig.kPIDVel[4]+steerController.calculate(state.angle.getRadians());
             steerMotor.requestVoltage(Volts.of(steerSignal*RobotController.getBatteryVoltage()));
+            steerMotor.updateControlSignal(null, null, moduleSimulation.getSteerAbsoluteAngle(), moduleSimulation.getSteerAbsoluteEncoderSpeed());
+
         }
 
         public SwerveModuleState getSwerveModuleState(){
             return moduleSimulation.getCurrentState();
         }
+
         public SwerveModulePosition getSwerveModulePosition(){
             return new SwerveModulePosition(moduleSimulation.getDriveWheelFinalPosition().in(Radians)*drivingEncoderPositionFactor,new Rotation2d(moduleSimulation.getSteerAbsoluteAngle()));
         }

@@ -23,8 +23,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    //initialize the instance variable
     ComponentHandler.initialize();
+    //initialize the instance variable
     instance = this;
   }
 
@@ -47,16 +47,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    new GoToPoint(
+    CommandScheduler.getInstance().schedule(new GoToPoint(
       new Pose2d(2,2,Rotation2d.kZero),
       PositionComponent.getInstance()::getPose2d,
       Drivetrain.getInstance()::getChassisSpeeds
-    );
+    ));
   }
 
   @Override
   public void autonomousPeriodic() {
-    
+    // System.out.println(PositionComponent.getInstance().getPose2d());
   }
   @Override
   public void testInit() {

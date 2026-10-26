@@ -1,5 +1,7 @@
 package frc.robot.PremadeDrivetrains.SwerveDrivetrain;
 
+import java.util.function.Supplier;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
@@ -13,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.Components.PositionComponent;
 import frc.robot.IOModels.Gyros.NavX2Gyro;
 import frc.robot.IOModels.SwerveModules.MaxSwerveModule;
 import frc.robot.IOModels.SwerveModules.SwerveModuleIO;
@@ -22,11 +25,13 @@ public class Drivetrain extends SubsystemBase{
 
     private final SwerveDriveKinematics kinematics;
     private final SwerveModuleIO[] swerveModules;
+    private final Supplier<Pose2d> poseSupplier;
     private SwerveDriveSimulation sim;
     
-    private Drivetrain(SwerveDriveKinematics kinematics, SwerveModuleIO[] swerveModules){
+    private Drivetrain(SwerveDriveKinematics kinematics, SwerveModuleIO[] swerveModules, Supplier<Pose2d> poseSupplier){
         this.kinematics = kinematics;
         this.swerveModules = swerveModules;
+        this.poseSupplier = poseSupplier;
     }
 
     public static Drivetrain getInstance(){
@@ -46,7 +51,7 @@ public class Drivetrain extends SubsystemBase{
                     DrivetrainConstants.backRightSteerMotorID,DrivetrainConstants.steerMotorConfig
                 )
             };
-            instance = new Drivetrain(DrivetrainConstants.kinematics, swerveModules);
+            instance = new Drivetrain(DrivetrainConstants.kinematics, swerveModules, PositionComponent.getInstance()::getPose2d);
             if(Robot.isSimulation()){
                 instance.setupSimulation();
             }
@@ -85,7 +90,7 @@ public class Drivetrain extends SubsystemBase{
         vomega = Math.signum(vomega)*(Math.min(Math.abs(vomega),DrivetrainConstants.maxTurnSpeed));
 
         ChassisSpeeds requestedSpeeds = 
-            fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, vomega, null) 
+            fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, vomega, poseSupplier.get().getRotation()) 
             : new ChassisSpeeds(vx,vy,vomega);
         
         SwerveModuleState[] requestedStates = kinematics.toSwerveModuleStates(requestedSpeeds);

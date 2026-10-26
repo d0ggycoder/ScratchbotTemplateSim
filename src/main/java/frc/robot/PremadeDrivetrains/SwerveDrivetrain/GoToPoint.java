@@ -19,7 +19,7 @@ public class GoToPoint extends Command{
     private Supplier<Pose2d> poseSupplier;
     private Supplier<ChassisSpeeds> speedSupplier;
 
-    private PIDController distController = new PIDController(0, 0, 0);
+    private PIDController distController = new PIDController(1.0, 0, 0);
     private TrapezoidProfile speedProfile = new TrapezoidProfile(
         new TrapezoidProfile.Constraints(DrivetrainConstants.maxDriveSpeed, DrivetrainConstants.maxAcceleration));
     private TrapezoidProfile.State initialSpeedState;
