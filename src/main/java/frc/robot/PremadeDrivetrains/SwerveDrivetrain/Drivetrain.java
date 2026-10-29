@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.littletonrobotics.junction.Logger;
 
 import com.studica.frc.AHRS.NavXComType;
 
@@ -76,8 +77,9 @@ public class Drivetrain extends SubsystemBase{
 
     @Override
     public void periodic() {
-        for(SwerveModuleIO module:swerveModules){
-            module.update();
+        for(int i=0;i<swerveModules.length;i++){
+            swerveModules[i].update();
+            Logger.recordOutput("Drivetrain/Outputs/SwerveModules/Module"+i,swerveModules[i].getSwerveModuleState());
         }
     }
 
@@ -95,6 +97,7 @@ public class Drivetrain extends SubsystemBase{
         
         SwerveModuleState[] requestedStates = kinematics.toSwerveModuleStates(requestedSpeeds);
         for(int i=0;i<swerveModules.length;i++){
+            Logger.recordOutput("Drivetrain/Inputs/SwerveModules/Module"+i,requestedStates[i]);
             swerveModules[i].setSwerveState(requestedStates[i]);
         }
     }

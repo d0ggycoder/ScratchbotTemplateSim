@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Pounds;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import frc.robot.IOModels.Motors.MotorIO.MotorConfig;
@@ -17,7 +16,7 @@ public class DrivetrainConstants {
     public static final double steerPositionI = 0;
     public static final double steerPositionD = 0.02;
 
-    public static final double driveVelocityP = 0.08;
+    public static final double driveVelocityP = 0.8;
     public static final double driveVelocityI = 0;
     public static final double driveVelocityD = 0.04;
 

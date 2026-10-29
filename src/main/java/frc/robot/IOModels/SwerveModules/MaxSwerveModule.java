@@ -12,6 +12,7 @@ import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -29,7 +30,8 @@ public class MaxSwerveModule implements SwerveModuleIO{
     private static final double wheelWidth = Meters.convertFrom(1, Inches);
     private static final double steerRatio = 9424.0/203.0; //TODO: Confirm that this is appropriate for your team!
     private static final double driveRatio = 1/5.08;
-    private static final double steeringMOI = 1.0/12 * 0.079 * (3*wheelRadius*wheelRadius + wheelWidth*wheelWidth); // 1/12 * M(3R^2+L^2)
+    // private static final double steeringMOI = 1.0/12 * 0.079 * (3*wheelRadius*wheelRadius + wheelWidth*wheelWidth); // 1/12 * M(3R^2+L^2)
+    private static final double steeringMOI = 0.01; //TODO: check value
     private static final double drivingEncoderPositionFactor = wheelCircumference * driveRatio;
     private static final double drivingEncoderVelocityFactor = wheelCircumference * driveRatio / 60;
 
@@ -127,7 +129,11 @@ public class MaxSwerveModule implements SwerveModuleIO{
     public static class SimulatedMaxSwerveModuleGetter implements Supplier<SwerveModuleSimulation>{
         private final SwerveModuleIO module;
         public SimulatedMaxSwerveModuleGetter(SwerveModuleIO module){
-            this.module = module;
+            if(module instanceof MaxSwerveModule){
+                this.module = ((MaxSwerveModule)module).module;
+            } else {
+                throw new IllegalArgumentException("SimulatedMaxSwerveModuleGetter must be used on a MaxSwerveModule");
+            }
         }
         @Override
         public SwerveModuleSimulation get(){
@@ -152,7 +158,7 @@ public class MaxSwerveModule implements SwerveModuleIO{
             moduleSimulation = new SwerveModuleSimulation(new SwerveModuleSimulationConfig(
                 DCMotor.getNeoVortex(1),
                 DCMotor.getNeo550(1),
-                driveRatio, 
+                1/driveRatio, 
                 steerRatio,
                 Volts.of(0.1), 
                 Volts.of(0.1), 
@@ -177,6 +183,7 @@ public class MaxSwerveModule implements SwerveModuleIO{
 
             steerController.setSetpoint(state.angle.getRadians());
             driveController.setSetpoint(state.speedMetersPerSecond);
+            // System.out.println(state.speedMetersPerSecond);
         }
         @Override
         public void update(){
@@ -184,14 +191,14 @@ public class MaxSwerveModule implements SwerveModuleIO{
             
             double curDriveSpeed = moduleSimulation.getDriveWheelFinalSpeed().in(RadiansPerSecond);
             double driveSignal = Math.signum(curDriveSpeed)*driveConfig.kPIDVel[3]+curDriveSpeed*driveConfig.kPIDVel[4]+driveController.calculate(state.speedMetersPerSecond);
+            driveSignal = MathUtil.clamp(driveSignal,-1,1);
+            System.out.println(driveSignal);
             driveMotor.requestVoltage(Volts.of(driveSignal*RobotController.getBatteryVoltage()));
-            driveMotor.updateControlSignal(null, null, moduleSimulation.getDriveWheelFinalPosition(),moduleSimulation.getDriveWheelFinalSpeed());
 
             double curSteerSpeed = moduleSimulation.getSteerAbsoluteEncoderSpeed().in(RadiansPerSecond);
             double steerSignal = Math.signum(curSteerSpeed)*steerConfig.kPIDPos[3]+curDriveSpeed*steerConfig.kPIDVel[4]+steerController.calculate(state.angle.getRadians());
+            steerSignal = MathUtil.clamp(steerSignal,-1,1);
             steerMotor.requestVoltage(Volts.of(steerSignal*RobotController.getBatteryVoltage()));
-            steerMotor.updateControlSignal(null, null, moduleSimulation.getSteerAbsoluteAngle(), moduleSimulation.getSteerAbsoluteEncoderSpeed());
-
         }
 
         public SwerveModuleState getSwerveModuleState(){

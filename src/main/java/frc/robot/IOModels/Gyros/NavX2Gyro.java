@@ -91,7 +91,11 @@ public class NavX2Gyro implements GyroIO{
     public static class SimualtedNavX2GyroGetter implements Supplier<GyroSimulation>{
         private final GyroIO gyro;
         public SimualtedNavX2GyroGetter(GyroIO gyro){
-            this.gyro = gyro;
+            if(gyro instanceof NavX2Gyro){
+                this.gyro = ((NavX2Gyro)gyro).gyro;
+            } else {
+                throw new IllegalArgumentException("SimulatedNavX2GyroGetter must be used on a NavX2Gyro");
+            }
         }
         public GyroSimulation get(){
             if(gyro instanceof SimulatedNavX2Gyro){

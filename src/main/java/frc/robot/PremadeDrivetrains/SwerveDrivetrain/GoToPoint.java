@@ -2,6 +2,8 @@ package frc.robot.PremadeDrivetrains.SwerveDrivetrain;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -56,9 +58,11 @@ public class GoToPoint extends Command{
         TrapezoidProfile.State calculatedSpeedState = speedProfile.calculate(
             Timer.getFPGATimestamp()-startTime,initialSpeedState,END_ZERO_VEL);
         double targetVel = calculatedSpeedState.velocity+distController.calculate(getDistance(),calculatedSpeedState.position);
-
+        
         Translation2d delta = targetPose.minus(poseSupplier.get()).getTranslation();
         Translation2d setVel = delta.times(targetVel/delta.getNorm());
+        Logger.recordOutput("Drivetrain/GoToPoint/TargetVelocity",setVel);
+
         Drivetrain.getInstance().setSwerveStates(setVel.getX(), setVel.getY(), 0, true);
     }
 

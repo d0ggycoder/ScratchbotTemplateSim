@@ -2,6 +2,8 @@ package frc.robot.Components;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.VecBuilder;
@@ -87,6 +89,7 @@ public class PositionComponent{
      */
     public void periodic(){
         lastCache = poseEstimator.update(gyro.getRotation(), swerveModulePositionSupplier.get());
+
         PoseEstimate limelightEstimate = LimelightComponent.calcAprilTag();
         if(limelightEstimate != null){
             double[] stddev = LimelightComponent.getStdDev();
